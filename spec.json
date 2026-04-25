@@ -1,0 +1,14 @@
+{
+    "system": "Riverbraid-Integrity-Floors",
+    "version": "1.0.0",
+    "invariants": {
+        "coupling_test": "binary",
+        "scale_separation": "gated",
+        "linearity": "nonlinear_tag",
+        "stationary_state": "immutable"
+    },
+    "thresholds": {
+        "max_entropy_delta": 0.0002,
+        "structural_governance": "strict"
+    }
+}
