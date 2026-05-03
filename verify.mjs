@@ -1,26 +1,27 @@
-﻿import { readFileSync, existsSync, readdirSync } from 'fs';
-import { resolve, dirname } from 'path';
-import { fileURLToPath } from 'url';
-
-const __dir = dirname(fileURLToPath(import.meta.url));
-const GENESIS_ANCHOR = '01a777';
-
-function fail(msg) {
-  console.error(`FAIL-CLOSED: ${msg}`);
-  process.exit(1);
+import fs from "node:fs";
+import crypto from "node:crypto";
+const repo = "Riverbraid-Integrity-Floors";
+const requiredFiles = ["package.json","AUTHORITY.md","RING.md"];
+const missing = requiredFiles.filter((file) => !fs.existsSync(file));
+const hash = crypto.createHash("sha256");
+for (const file of requiredFiles) {
+  if (fs.existsSync(file)) {
+    hash.update(file);
+    hash.update("\0");
+    hash.update(fs.readFileSync(file));
+    hash.update("\0");
+  }
 }
-
-// Check Anchor
-const anchorPath = resolve(__dir, '.anchor');
-if (!existsSync(anchorPath)) fail('Missing .anchor file');
-const anchor = readFileSync(anchorPath, 'utf8').trim();
-if (anchor !== GENESIS_ANCHOR) fail('Anchor mismatch');
-
-// Check for Structural Integrity (Cargo, Spec, or Source)
-const artifacts = ['Cargo.toml', 'spec.json', 'src', 'package.json'];
-const found = artifacts.some(f => existsSync(resolve(__dir, f)));
-
-if (!found) fail('Structural Integrity Check Failed: No build or source artifacts found.');
-
-console.log('STATIONARY: System integrity verified.');
-process.exit(0);
+const ok = missing.length === 0;
+const output = {
+  repo,
+  status: ok ? "VERIFIED" : "FAILED",
+  verification_scope: "ring0-file-surface",
+  claim_boundary: "declared-conditions-only",
+  required_files: requiredFiles,
+  missing_files: missing,
+  failure_codes: ok ? [] : ["REQUIRED_FILES_MISSING"],
+  digest: "sha256:" + hash.digest("hex")
+};
+fs.writeFileSync("verify-output.json", JSON.stringify(output, null, 2));
+process.exit(ok ? 0 : 1);

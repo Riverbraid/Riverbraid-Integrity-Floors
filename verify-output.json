@@ -1,0 +1,14 @@
+{
+  "repo": "Riverbraid-Integrity-Floors",
+  "status": "VERIFIED",
+  "verification_scope": "ring0-file-surface",
+  "claim_boundary": "declared-conditions-only",
+  "required_files": [
+    "package.json",
+    "AUTHORITY.md",
+    "RING.md"
+  ],
+  "missing_files": [],
+  "failure_codes": [],
+  "digest": "sha256:74477082d4c1d4456b7a06e92251d80682503a242735caaee90c67c358593c54"
+}
